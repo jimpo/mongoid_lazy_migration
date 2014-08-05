@@ -8,7 +8,12 @@ DATABASE = 'mongoid_lazy_migration_test'
 
 Mongoid.configure do |config|
   if Mongoid::LazyMigration.mongoid3
-    config.connect_to(DATABASE)
+    config.sessions = {
+      default: {
+        database: DATABASE,
+        hosts: ["#{HOST}:#{PORT}"]
+      }
+    }
     ::BSON = ::Moped::BSON
   else
     database = Mongo::Connection.new(HOST, PORT.to_i).db(DATABASE)
@@ -19,7 +24,6 @@ end
 
 RSpec.configure do |config|
   config.mock_with :mocha
-  config.color_enabled = true
 
   config.before(:each) do
   if Mongoid::LazyMigration.mongoid3

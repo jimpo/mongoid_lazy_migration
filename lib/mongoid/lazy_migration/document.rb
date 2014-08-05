@@ -20,7 +20,7 @@ module Mongoid::LazyMigration::Document
     end
 
     # see perform migration
-    super.merge(:migration_state => { "$ne" => :done })
+    super.merge('migration_state' => { "$ne" => :done })
   end
 
   def run_callbacks(*args, &block)
@@ -39,7 +39,6 @@ module Mongoid::LazyMigration::Document
 
     begin
       self.class.skip_callback :create, :update
-      Mongoid::Threaded.timeless = true
 
       @running_migrate_block = true
       instance_eval(&self.class.migrate_block)
@@ -55,7 +54,6 @@ module Mongoid::LazyMigration::Document
       self.migration_state = :done
       save(:validate => false)
     ensure
-      Mongoid::Threaded.timeless = false
       self.class.set_callback :create, :update
     end
   end
