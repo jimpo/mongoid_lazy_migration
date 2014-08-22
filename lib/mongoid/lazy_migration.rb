@@ -7,6 +7,7 @@ module Mongoid
     require 'mongoid/lazy_migration/version'
     require 'mongoid/lazy_migration/document'
     require 'mongoid/lazy_migration/tasks'
+    require 'mongoid/lazy_migration/lock'
 
     extend ActiveSupport::Concern
     extend Tasks
@@ -24,9 +25,15 @@ module Mongoid
         field :migration_state, :type => Symbol, :default => :pending
         after_initialize :ensure_migration, :unless => proc { @migrating }
 
-        cattr_accessor :migrate_block, :lock_migration
+        cattr_accessor :migrate_block, :migration_lock
         self.migrate_block = block
-        self.lock_migration = options[:lock]
+        self.migration_lock = options[:lock]
+        if migration_lock == true
+          # Use Mongoid lock as default lock
+          self.migration_lock = ->(document) do
+            Mongoid::LazyMigration::Mongoid3Lock.new(document)
+          end
+        end
 
         Mongoid::LazyMigration.models_to_migrate << self
       end
