@@ -7,25 +7,25 @@ describe Mongoid::LazyMigration, ".migrate" do
   let!(:pendings_atomic) { 5.times { ModelAtomic.collection.insert({})} }
 
   it "migrates all the models by default" do
-    ModelLock.where(:migrated => true).count.should == 0
-    ModelAtomic.where(:migrated => true).count.should == 0
+    expect(ModelLock.where(:migrated => true).count).to eq(0)
+    expect(ModelAtomic.where(:migrated => true).count).to eq(0)
     Mongoid::LazyMigration.migrate
-    ModelLock.where(:migrated => true).count.should == 5
-    ModelAtomic.where(:migrated => true).count.should == 5
+    expect(ModelLock.where(:migrated => true).count).to eq(5)
+    expect(ModelAtomic.where(:migrated => true).count).to eq(5)
   end
 
   it "migrates all the documents of a specific class" do
-    ModelLock.where(:migrated => true).count.should == 0
+    expect(ModelLock.where(:migrated => true).count).to eq(0)
     Mongoid::LazyMigration.migrate(ModelLock)
-    ModelLock.where(:migrated => true).count.should == 5
+    expect(ModelLock.where(:migrated => true).count).to eq(5)
 
-    ModelAtomic.where(:migrated => true).count.should == 0
+    expect(ModelAtomic.where(:migrated => true).count).to eq(0)
   end
 
   it "supports a criteria" do
-    ModelLock.where(:migrated => true).count.should == 0
+    expect(ModelLock.where(:migrated => true).count).to eq(0)
     Mongoid::LazyMigration.migrate(ModelLock.limit(2))
-    ModelLock.where(:migrated => true).count.should == 2
+    expect(ModelLock.where(:migrated => true).count).to eq(2)
   end
 end
 
@@ -35,16 +35,16 @@ describe Mongoid::LazyMigration, ".cleanup" do
 
   it "cleans up all the documents of a specific class" do
     Mongoid::LazyMigration.cleanup(ModelNoMigration)
-    ModelNoMigration.where(:migration_state => nil).count.should == 2
+    expect(ModelNoMigration.where(:migration_state => nil).count).to eq(2)
   end
 
   it "chokes if any documents are still being processed" do
     ModelNoMigration.collection.insert(:migration_state => :processing)
-    proc { Mongoid::LazyMigration.cleanup(ModelNoMigration) }.should raise_error
-    ModelNoMigration.where(:migration_state => nil).count.should == 0
+    expect { Mongoid::LazyMigration.cleanup(ModelNoMigration) }.to raise_error
+    expect(ModelNoMigration.where(:migration_state => nil).count).to eq(0)
   end
 
   it "chokes if the migration is still defined" do
-    proc { Mongoid::LazyMigration.cleanup(ModelAtomic) }.should raise_error
+    expect { Mongoid::LazyMigration.cleanup(ModelAtomic) }.to raise_error
   end
 end

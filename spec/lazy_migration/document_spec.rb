@@ -13,19 +13,19 @@ describe Mongoid::LazyMigration::Document, ".migration(lock)" do
   let(:done)       { insert_raw(ModelLock, :migration_state => :done) }
 
   it "migrates pending models on fetch" do
-    ModelLock.find(pending).migrated.should == true
+    expect(ModelLock.find(pending).migrated).to be_truthy
   end
 
   it "doesn't migrate done models on fetch" do
-    ModelLock.find(done).migrated.should_not == true
+    expect(ModelLock.find(done).migrated).to be_falsy
   end
 
   it "doesn't update the updated_at field during the migration" do
     model = ModelLock.find(pending)
-    model.updated_at.should == nil
+    expect(model.updated_at).to be_nil
     model.some_field = "bacon"
     model.save
-    model.updated_at.should_not == nil
+    expect(model.updated_at).not_to be_nil
   end
 
   # I don't know how to test this. Please help.
@@ -39,11 +39,11 @@ describe Mongoid::LazyMigration::Document, ".migration(atomic)" do
   let(:done)       { insert_raw(ModelAtomic, :migration_state => :done) }
 
   it "migrates pending models on fetch" do
-    ModelAtomic.find(pending).migrated.should == true
+    expect(ModelAtomic.find(pending).migrated).to be_truthy
   end
 
   it "doesn't migrate done models on fetch" do
-    ModelAtomic.find(done).migrated.should_not == true
+    expect(ModelAtomic.find(done).migrated).to be_falsy
   end
 
   # I don't know how to test this. Please help.
@@ -70,11 +70,11 @@ describe Mongoid::LazyMigration::Document, ".migration" do
 
     id = insert_raw(ModelCallbacks)
     model = ModelCallbacks.find(id)
-    ModelCallbacks.callback_called.should == 0
+    expect(ModelCallbacks.callback_called).to eq(0)
 
     model.some_field = "bacon"
     model.save
-    ModelCallbacks.callback_called.should == 4
+    expect(ModelCallbacks.callback_called).to eq(4)
   end
 
   it "does not validate" do
@@ -95,7 +95,7 @@ describe Mongoid::LazyMigration::Document, ".migration" do
     id = insert_raw(ModelValidate)
     ModelValidate.find(id)
     ModelValidate.find(id)
-    ModelValidate.migration_count.should == 1
+    expect(ModelValidate.migration_count).to eq(1)
   end
 
   it "does not allow saving during the migration" do
@@ -111,13 +111,13 @@ describe Mongoid::LazyMigration::Document, ".migration" do
     Mongoid::LazyMigration.models_to_migrate.delete(ModelInvalid)
 
     id = insert_raw(ModelInvalid)
-    proc { ModelInvalid.find(id) }.should raise_error
+    expect { ModelInvalid.find(id) }.to raise_error
   end
 
   describe "#atomic_selector" do
     it 'returns the original selector when not doing a migration' do
       m = ModelAtomic.create
-      m.atomic_selector.should == { "_id" => m._id }
+      expect(m.atomic_selector).to eq("_id" => m._id)
     end
   end
 
