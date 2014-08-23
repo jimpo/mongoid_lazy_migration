@@ -1,13 +1,22 @@
-module Mongoid::LazyMigration::Tasks
-  def migrate(criteria=nil)
-    require 'ruby-progressbar'
+require 'ruby-progressbar'
+require 'mongoid/lazy_migration/errors'
 
-    criterias = criteria.nil? ? Mongoid::LazyMigration.models_to_migrate : [criteria]
+module Mongoid::LazyMigration::Tasks
+  include Mongoid::LazyMigration::Errors
+
+  def migrate(criteria=nil, output=STDOUT)
+    criterias =
+      if criteria.nil?
+        Mongoid::LazyMigration.models_to_migrate
+      else
+        [criteria]
+      end
     criterias.each do |criteria|
       to_migrate = criteria.where(:migration_state.ne => :done)
       progress = ProgressBar.create(
         title: to_migrate.klass.to_s,
-        total: to_migrate.count
+        total: to_migrate.count,
+        output: output
       )
       to_migrate.each { progress.increment }
       progress.finish
@@ -17,7 +26,8 @@ module Mongoid::LazyMigration::Tasks
 
   def cleanup(model)
     if model.in? Mongoid::LazyMigration.models_to_migrate
-      raise "Remove the migration from your model before cleaning up the database"
+      raise CleanupError.new(
+        "Remove the migration from your model before cleaning up the database")
     end
 
     if model.where(:migration_state => :processing).limit(1).count > 0

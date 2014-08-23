@@ -26,7 +26,7 @@ RSpec.configure do |config|
   config.mock_with :mocha
 
   config.before(:each) do
-  if Mongoid::LazyMigration.mongoid3
+    if Mongoid::LazyMigration.mongoid3
       Mongoid.purge!
     else
       Mongoid.database.collections.each do |collection|

@@ -1,22 +1,22 @@
 require 'spec_helper'
 require 'support/models'
-require 'support/mute_progressbar'
 
 describe Mongoid::LazyMigration, ".migrate" do
   let!(:pendings_lock)   { 5.times { ModelLock.collection.insert({})} }
   let!(:pendings_atomic) { 5.times { ModelAtomic.collection.insert({})} }
+  let(:progressbar_output) { StringIO.new }
 
   it "migrates all the models by default" do
     expect(ModelLock.where(:migrated => true).count).to eq(0)
     expect(ModelAtomic.where(:migrated => true).count).to eq(0)
-    Mongoid::LazyMigration.migrate
+    Mongoid::LazyMigration.migrate(nil, progressbar_output)
     expect(ModelLock.where(:migrated => true).count).to eq(5)
     expect(ModelAtomic.where(:migrated => true).count).to eq(5)
   end
 
   it "migrates all the documents of a specific class" do
     expect(ModelLock.where(:migrated => true).count).to eq(0)
-    Mongoid::LazyMigration.migrate(ModelLock)
+    Mongoid::LazyMigration.migrate(ModelLock, progressbar_output)
     expect(ModelLock.where(:migrated => true).count).to eq(5)
 
     expect(ModelAtomic.where(:migrated => true).count).to eq(0)
@@ -24,7 +24,7 @@ describe Mongoid::LazyMigration, ".migrate" do
 
   it "supports a criteria" do
     expect(ModelLock.where(:migrated => true).count).to eq(0)
-    Mongoid::LazyMigration.migrate(ModelLock.limit(2))
+    Mongoid::LazyMigration.migrate(ModelLock.limit(2), progressbar_output)
     expect(ModelLock.where(:migrated => true).count).to eq(2)
   end
 end

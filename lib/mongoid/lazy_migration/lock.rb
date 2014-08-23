@@ -31,12 +31,17 @@ module Mongoid::LazyMigration
         .with(safe: true)
         .where(@document.atomic_selector)
         .where(@lock_field => nil)
-        .find_and_modify('$set' => { @lock_field => @owner })
-      return !!result
+        .set(@lock_field, @owner)
+      result['updatedExisting']
     end
 
     def unlock
-      @document.unset(@lock_field)
+      result = @document.class
+        .with(safe: true)
+        .where(@document.atomic_selector)
+        .where(@lock_field => @owner)
+        .unset(@lock_field)
+      result['updatedExisting']
     end
   end
 

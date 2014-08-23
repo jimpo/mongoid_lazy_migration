@@ -1,4 +1,8 @@
+require 'mongoid/lazy_migration/errors'
+
 module Mongoid::LazyMigration::Document
+  include Mongoid::LazyMigration::Errors
+
   def ensure_migration
     self.migration_state = :done if new_record?
 
@@ -24,11 +28,13 @@ module Mongoid::LazyMigration::Document
     return super unless @migrating && self.class.migration_lock.nil?
 
     if @running_migrate_block
-      raise ["You cannot save during an atomic migration,",
-             "You are only allowed to set the document fields",
-             "The document will be commited once the migration is complete.",
-             "If you need to get fancy, like creating associations, use :lock => true"
-            ].join("\n")
+      raise AtomicMigrationError.new(<<EOS
+You cannot save during an atomic migration,
+You are only allowed to set the document fields
+The document will be commited once the migration is complete.
+If you need to get fancy, like creating associations, use :lock => true
+EOS
+      )
     end
 
     super.merge('migration_state' => { "$ne" => :done })
