@@ -41,9 +41,9 @@ EOS
   end
 
   def run_callbacks(*args, &block)
-    return super(*args, &block) unless @migrating
+    return super unless @migrating
 
-    block.call if block
+    yield if block_given?
   end
 
   private
@@ -58,17 +58,11 @@ EOS
   end
 
   def perform_migration
-    begin
-      self.class.skip_callback :create, :update
+    @running_migrate_block = true
+    instance_eval(&self.class.migrate_block)
+    @running_migrate_block = false
 
-      @running_migrate_block = true
-      instance_eval(&self.class.migrate_block)
-      @running_migrate_block = false
-
-      self.migration_state = :done
-      save(:validate => false)
-    ensure
-      self.class.set_callback :create, :update
-    end
+    self.migration_state = :done
+    save(:validate => false)
   end
 end

@@ -38,12 +38,6 @@ describe Mongoid::LazyMigration, ".cleanup" do
     expect(ModelNoMigration.where(:migration_state => nil).count).to eq(2)
   end
 
-  it "chokes if any documents are still being processed" do
-    ModelNoMigration.collection.insert(:migration_state => :processing)
-    expect { Mongoid::LazyMigration.cleanup(ModelNoMigration) }.to raise_error
-    expect(ModelNoMigration.where(:migration_state => nil).count).to eq(0)
-  end
-
   it "chokes if the migration is still defined" do
     expect { Mongoid::LazyMigration.cleanup(ModelAtomic) }.to raise_error
   end
