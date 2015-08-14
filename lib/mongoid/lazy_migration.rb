@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/concern'
 require 'active_support/core_ext'
 require 'set'
@@ -12,9 +13,6 @@ module Mongoid
     extend ActiveSupport::Concern
     extend Tasks
 
-    mattr_reader :mongoid3
-    @@mongoid3 = Gem.loaded_specs['mongoid'].version >= Gem::Version.new('3.0.0')
-
     mattr_reader :models_to_migrate
     @@models_to_migrate = Set.new
 
@@ -23,7 +21,8 @@ module Mongoid
         include Mongoid::LazyMigration::Document
 
         field :migration_state, :type => Symbol, :default => :pending
-        after_initialize :ensure_migration, :unless => proc { @migrating }
+        after_initialize :ensure_migration,
+          :unless => -> { @migrating || !__selected_fields.nil? }
 
         cattr_accessor :migrate_block, :migration_lock
         self.migrate_block = block

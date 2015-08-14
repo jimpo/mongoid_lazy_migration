@@ -39,6 +39,7 @@ describe Mongoid::LazyMigration, ".cleanup" do
   end
 
   it "chokes if the migration is still defined" do
-    expect { Mongoid::LazyMigration.cleanup(ModelAtomic) }.to raise_error
+    expect { Mongoid::LazyMigration.cleanup(ModelAtomic) }
+      .to raise_error(Mongoid::LazyMigration::Errors::CleanupError)
   end
 end

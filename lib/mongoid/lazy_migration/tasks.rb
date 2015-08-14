@@ -35,10 +35,6 @@ module Mongoid::LazyMigration::Tasks
     safety   = { :safe => true, :multi => true }
     multi    = { :multi => true }
 
-    if Mongoid::LazyMigration.mongoid3
-      model.with(safety).where(selector).query.update(changes, multi)
-    else
-      model.collection.update(selector, changes, safety.merge(multi))
-    end
+    model.with(safety).where(selector).query.update(changes, multi)
   end
 end

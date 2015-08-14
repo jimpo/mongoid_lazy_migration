@@ -31,7 +31,7 @@ module Mongoid::LazyMigration
         .with(safe: true)
         .where(@document.atomic_selector)
         .where(@lock_field => nil)
-        .set(@lock_field, @owner)
+        .set(@lock_field => @owner)
       result['updatedExisting']
     end
 
