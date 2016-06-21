@@ -63,6 +63,6 @@ EOS
     @running_migrate_block = false
 
     self.migration_state = :done
-    save(:validate => false)
+    save(validate: false)
   end
 end

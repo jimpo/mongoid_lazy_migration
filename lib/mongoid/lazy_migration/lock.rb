@@ -23,27 +23,21 @@ module Mongoid::LazyMigration
     def lock(timeout = 10)
       with_timeout(timeout) { do_lock }
     end
-  end
 
-  class Mongoid3Lock < Lock
     def do_lock
       result = @document.class
-        .with(safe: true)
         .where(@document.atomic_selector)
         .where(@lock_field => nil)
         .set(@lock_field => @owner)
-      result['updatedExisting']
+      result.modified_count
     end
 
     def unlock
       result = @document.class
-        .with(safe: true)
         .where(@document.atomic_selector)
         .where(@lock_field => @owner)
         .unset(@lock_field)
-      result['updatedExisting']
+      result.modified_count
     end
   end
-
-  # TODO(but probably not): Add Mongoid2Lock
 end

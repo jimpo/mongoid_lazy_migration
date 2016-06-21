@@ -5,7 +5,7 @@ describe Mongoid::LazyMigration::Document do
   describe ".migration" do
     def insert_raw(type, fields={})
       id = BSON::ObjectId.new
-      type.collection.insert({:_id => id}.merge(fields))
+      type.collection.insert_one({:_id => id}.merge(fields))
       id
     end
 

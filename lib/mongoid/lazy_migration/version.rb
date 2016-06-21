@@ -1,5 +1,5 @@
 module Mongoid
   module LazyMigration
-    VERSION = "2.0.0"
+    VERSION = "5.0.0"
   end
 end

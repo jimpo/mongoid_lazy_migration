@@ -13,9 +13,9 @@ Gem::Specification.new do |s|
   s.summary     = "Mongoid lazy migration toolkit"
   s.description = "Migrate your documents lazily in atomic, or locked fashion to avoid downtime"
 
-  s.add_dependency("mongoid", "~> 4.0")
-  s.add_dependency("activesupport")
-  s.add_dependency("ruby-progressbar")
+  s.add_dependency("mongoid", "~> 5.0")
+  s.add_dependency("activesupport", "~> 4.0")
+  s.add_dependency("ruby-progressbar", "~> 1.5")
 
   s.files        = Dir["lib/**/*"] + ['README.md']
   s.require_path = 'lib'

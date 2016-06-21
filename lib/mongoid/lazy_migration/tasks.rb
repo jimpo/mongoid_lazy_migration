@@ -30,11 +30,8 @@ module Mongoid::LazyMigration::Tasks
         "Remove the migration from your model before cleaning up the database")
     end
 
-    selector = { :migration_state => { "$exists" => true }}
-    changes  = {"$unset" => { :migration_state => 1}}
-    safety   = { :safe => true, :multi => true }
-    multi    = { :multi => true }
-
-    model.with(safety).where(selector).query.update(changes, multi)
+    model
+      .where(:migration_state.exists => true)
+      .update_all('$unset' => { migration_state: true })
   end
 end

@@ -30,7 +30,7 @@ module Mongoid
         if migration_lock == true
           # Use Mongoid lock as default lock
           self.migration_lock = ->(document) do
-            Mongoid::LazyMigration::Mongoid3Lock.new(document)
+            Mongoid::LazyMigration::Lock.new(document)
           end
         end
 

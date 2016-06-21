@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'support/models'
 
 describe Mongoid::LazyMigration, ".migrate" do
-  let!(:pendings_lock)   { 5.times { ModelLock.collection.insert({})} }
-  let!(:pendings_atomic) { 5.times { ModelAtomic.collection.insert({})} }
+  let!(:pendings_lock)   { 5.times { ModelLock.collection.insert_one({})} }
+  let!(:pendings_atomic) { 5.times { ModelAtomic.collection.insert_one({})} }
   let(:progressbar_output) { StringIO.new }
 
   it "migrates all the models by default" do
@@ -30,8 +30,8 @@ describe Mongoid::LazyMigration, ".migrate" do
 end
 
 describe Mongoid::LazyMigration, ".cleanup" do
-  let!(:done1) { ModelNoMigration.collection.insert(:migration_state => :done) }
-  let!(:done2) { ModelNoMigration.collection.insert(:migration_state => :done) }
+  let!(:done1) { ModelNoMigration.collection.insert_one(:migration_state => :done) }
+  let!(:done2) { ModelNoMigration.collection.insert_one(:migration_state => :done) }
 
   it "cleans up all the documents of a specific class" do
     Mongoid::LazyMigration.cleanup(ModelNoMigration)

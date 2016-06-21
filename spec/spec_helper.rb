@@ -10,7 +10,7 @@ DATABASE = 'mongoid_lazy_migration_test'
 
 Mongoid.configure do |config|
   config.load_configuration(
-    sessions: {
+    clients: {
       default: {
         database: DATABASE,
         hosts: ["#{HOST}:#{PORT}"]
