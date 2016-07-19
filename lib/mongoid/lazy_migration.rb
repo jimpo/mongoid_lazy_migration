@@ -20,7 +20,7 @@ module Mongoid
       def migration(options = {}, &block)
         include Mongoid::LazyMigration::Document
 
-        field :migration_state, :type => Symbol, :default => :pending
+        field :migration_state, :type => Symbol
         after_initialize :ensure_migration,
           :unless => -> { @migrating || !__selected_fields.nil? }
 

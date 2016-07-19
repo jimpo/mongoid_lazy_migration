@@ -35,6 +35,24 @@ describe Mongoid::LazyMigration::Document do
       expect(ModelCallbacks.callback_called).to eq(4)
     end
 
+    it "migrates document with a nil migration_state" do
+      class SampleModel
+        include Mongoid::Document
+        include Mongoid::LazyMigration
+        cattr_accessor :migration_count
+        @@migration_count = 0
+
+        migration do
+          self.class.migration_count += 1
+        end
+      end
+      Mongoid::LazyMigration.models_to_migrate.delete(SampleModel)
+
+      id = insert_raw(SampleModel, migration_state: nil)
+      SampleModel.find(id)
+      expect(SampleModel.migration_count).to eq(1)
+    end
+
     it "does not validate" do
       class ModelValidate
         include Mongoid::Document
