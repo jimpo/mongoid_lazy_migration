@@ -6,7 +6,7 @@ module Mongoid::LazyMigration::Document
   def ensure_migration
     self.migration_state = :done if new_record?
 
-    if migration_state == :pending
+    if migration_state != :done
       @migrating = true
       if self.class.migration_lock.nil?
         perform_migration
@@ -52,7 +52,7 @@ EOS
     lock = lock.call(self) if lock.respond_to? :call
     lock.lock
     reload  # Other process that had the lock may have changed this document
-    perform_migration if migration_state == :pending
+    perform_migration if migration_state != :done
   ensure
     lock.unlock
   end
